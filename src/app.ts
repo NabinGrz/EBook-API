@@ -3,6 +3,8 @@ import globalErrorHandler from "./middlewares/globalErrorHandler";
 import userRouter from "./user/userRouter";
 const app = express();
 
+//** THIS NEEDS TO USE TO ENABLE JSON PARSING,, OTHERWISE REEQUEST WILL CRASH */
+app.use(express.json());
 //ROUTES
 //HTTP METHODS
 
