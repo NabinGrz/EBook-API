@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import userRouter from "./userRouter";
 import { Request, Response, NextFunction } from "express";
 import userModel from "./userModel";
+import bcrypt from "bcrypt";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
@@ -24,6 +25,9 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     );
     return next(error);
   }
+  //!PASSWORD- HASH
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   //!PROCESS
   //!RESPONSE
   res.json({ message: "User Registered" });
