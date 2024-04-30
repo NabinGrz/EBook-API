@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
+import userRouter from "./user/userRouter";
 const app = express();
 
 //ROUTES
@@ -10,6 +11,8 @@ app.get("/", (req, res, next) => {
     message: "Welcome the Ebook API'S",
   });
 });
+
+app.use("/api/users", userRouter);
 
 //GLOBAL ERROR HANDLER
 //***MAKE SURE IS AT LAST OF ROUTES
