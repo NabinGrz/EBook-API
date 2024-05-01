@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import userRouter from "./user/userRouter";
+import bookRouter from "./book/bookRouter";
 const app = express();
 
 //** THIS NEEDS TO USE TO ENABLE JSON PARSING,, OTHERWISE REEQUEST WILL CRASH */
@@ -15,6 +16,7 @@ app.get("/", (req, res, next) => {
 });
 
 app.use("/api/users", userRouter);
+app.use("/api/books", bookRouter);
 
 //GLOBAL ERROR HANDLER
 //***MAKE SURE IS AT LAST OF ROUTES
