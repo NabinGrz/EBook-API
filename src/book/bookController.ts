@@ -30,19 +30,20 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     //**------------------------------------------------------ */
     const bookPDFMimeType = files.file[0].mimetype.split("/").at(-1);
     const bookFileName = files.file[0].filename;
-    const bookFilPath = path.resolve(
+    const bookFilePath = path.resolve(
       __dirname,
       "../../public/data/upload",
       bookFileName
     );
 
-    bookFileUploadResult = await cloudinary.uploader.upload(bookFilPath, {
+    bookFileUploadResult = await cloudinary.uploader.upload(bookFilePath, {
       resource_type: "raw",
       filename_override: bookFileName,
       folder: "book-pdfs",
       format: bookPDFMimeType,
     });
-
+    // @ts-ignore
+    // console.log("userID", req.userId);
     const newBook = await bookModel.create({
       title,
       genre,
@@ -53,7 +54,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     try {
       //**DELETE TEMP FILES */
       await fs.promises.unlink(coverImagefilePath);
-      await fs.promises.unlink(bookFilPath);
+      await fs.promises.unlink(bookFilePath);
       res.status(201).json({
         id: newBook._id,
       });
@@ -66,7 +67,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
 
   console.log("files", coverImageUploadResult);
   console.log("files", bookFileUploadResult);
-  res.json({});
+  //   res.json({});
 };
 
 export { createBook };
