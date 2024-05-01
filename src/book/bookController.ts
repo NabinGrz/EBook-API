@@ -157,4 +157,60 @@ const listBooks = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "Error while getting list of books"));
   }
 };
-export { createBook, updateBook, listBooks };
+const getBookDetail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const bookId = req.params.bookId;
+  try {
+    const book = await bookModel.findOne({
+      _id: bookId,
+    });
+    if (!book) {
+      return next(createHttpError(404, "Book not found"));
+    }
+
+    return res.json(book);
+  } catch (error) {
+    return next(createHttpError(500, "Error while getting book detail"));
+  }
+};
+const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
+  const bookId = req.params.bookId;
+  try {
+    const book = await bookModel.findOneAndDelete({
+      _id: bookId,
+    });
+    if (!book) {
+      return next(createHttpError(404, "Book not found"));
+    }
+    const _req = req as AuthRequest;
+    //**CHECK IF BOOK IS CREATED BY AUTHOR */
+    if (book.author.toString() !== _req.userId) {
+      return next(createHttpError(403, "You cannot delete others book"));
+    }
+    try {
+      const coverFileSplits = book.coverImage.split("/");
+      const coverImagePubliID =
+        coverFileSplits.at(-2) +
+        "/" +
+        coverFileSplits.at(-1)?.split(".").at(-2);
+
+      const bookFileSplits = book.file.split("/");
+      const bookFilePublicID =
+        bookFileSplits.at(-2) + "/" + bookFileSplits.at(-1);
+      await cloudinary.uploader.destroy(coverImagePubliID);
+      await cloudinary.uploader.destroy(bookFilePublicID, {
+        resource_type: "raw", //?THIS IS NEED IN PDF ONLY
+      });
+
+      return res.status(204).json({ id: bookId });
+    } catch (error) {
+      return next(createHttpError(500, "Error while deleting book"));
+    }
+  } catch (error) {
+    return next(createHttpError(500, "Error while deleting book"));
+  }
+};
+export { createBook, updateBook, listBooks, getBookDetail, deleteBook };
