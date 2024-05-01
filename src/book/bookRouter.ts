@@ -1,5 +1,5 @@
 import express from "express";
-import { createBook, updateBook } from "./bookController";
+import { createBook, listBooks, updateBook } from "./bookController";
 import multer from "multer"; //? FOR USING MULTIPART/FORMDATA
 import path from "node:path";
 import authenticate from "../middlewares/authenticate";
@@ -9,6 +9,7 @@ const upload = multer({
   limits: { fieldSize: 1e7 }, //?30MB
 });
 //ROUTES
+bookRouter.get("/", listBooks);
 bookRouter.post(
   "/",
   authenticate,
