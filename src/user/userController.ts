@@ -3,6 +3,8 @@ import userRouter from "./userRouter";
 import { Request, Response, NextFunction } from "express";
 import userModel from "./userModel";
 import bcrypt from "bcrypt";
+import { sign } from "jsonwebtoken";
+import { config } from "../config/config";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
@@ -27,10 +29,26 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   }
   //!PASSWORD- HASH
   const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = await userModel.create({
+    name,
+    email,
+    password: hashedPassword,
+  });
 
+  //**JWT TOKEN GENERATE */
+  const token = sign(
+    {
+      sub: newUser._id,
+    },
+    config.jwtSecret as string,
+    {
+      expiresIn: "7d",
+      algorithm: "HS256", //? THIS IS DEFAULT
+    }
+  );
   //!PROCESS
   //!RESPONSE
-  res.json({ message: "User Registered" });
+  res.json({ accessToken: token });
 };
 
 export { createUser };
